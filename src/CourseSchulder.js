@@ -61,6 +61,67 @@ for (i=0; i<graph.length; i++) {
 //     console.log(class_rev_hash[course]);
 // });
 
+function check_valid_semester(courses) {
+    for (i=0; i < courses.length; i++) {
+        var course = courses[i][0];
+        var course_sem = courses[i][1];
+        if (course_sem < 0 || course_sem > 7) {
+            return false;
+        }
+        if (class_hash[course][sem] == "0") {
+            if (course_sem % 2 == 1) {
+                return false;
+            }
+        } else if (class_hash[course][sem] == "1") {
+            if (course_sem % 2 == 0) {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+function get_starting_point(major, degree, sem, taken) {
+    // Something like this, edit based on where graphs are and such
+    var validation = validate(taken, sem)
+    var valid_bool = false;
+    var courses = [];
+    if (validation == "valid") {
+        valid = true;
+        courses = recommendation([], sem);
+    }
+    return {valid:valid_bool, message:validation};
+}
+
+function validate(taken, sem) {
+    var verified = [];
+    var remaining = taken;
+    while (remaining.length > 0) {
+        var flag = true;
+        for (r in remaining) {
+            if (class_hash[r][prereq].every(elem => verified.indexOf(elem) > -1)) {
+                verified.push(r);
+                remaining.pop(r);
+                flag = false
+            }
+        }
+        if (flag) {
+            return "Your courses have inadequate prerequisites!";
+        }
+    }
+
+    // TODO bfs
+
+    return "valid";
+}
+
+function get_classes(major, degree) {
+    var output = [];
+    for (key in graph.keys()) {
+        output.push({name:key});
+    }
+    return {courses:output};
+}
 
 // Add all toplevel course : class with no postrequisite
 Object.keys(class_rev_hash).forEach(function(course,index) {
