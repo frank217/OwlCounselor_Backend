@@ -95,7 +95,7 @@ class Course {
 
 * **URL**
 
-  /api/courses
+  /api/getstartpoint
 
 * **Method:**
   
