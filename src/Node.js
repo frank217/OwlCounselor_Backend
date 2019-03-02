@@ -1,7 +1,8 @@
 class Node {
-    constructor(id, prev) {
+    constructor(id, prev,sem) {
         this.id = id;
         this.prev = prev;
+        this.sem = sem
     }
 }
 

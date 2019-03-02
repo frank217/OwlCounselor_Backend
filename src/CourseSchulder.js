@@ -19,38 +19,49 @@ var class_rev_hash = {}
 // TODO : add semester once it is in the data 
 for (i=0; i<graph.length; i++) {
     prereqs = graph[i].prev;
-    for (j=0; j<prereqs.length;j++) {
-        prereqs[j] = prereqs[j].split("; ");
-    }
+    sem = graph[i].sem
+    // console.log(graph[i].id)
+    // console.log(prereqs)
+    // console.log(graph[i].sem)
     // Add to prerequisite of class
-    class_hash[graph[i].id] = {"prereq":graph[i].prev};
+    class_hash[graph[i].id] = {"prereq":graph[i].prev,"sem":sem};
     // Add to postrequisite of class
     if (!(graph[i].id in class_rev_hash)) {
-        class_rev_hash[graph[i].id] = {"postreq":[]}
+        class_rev_hash[graph[i].id] = {"postreq":[],"sem":sem}
     }
+
     for (j=0; j<prereqs.length; j++) {
         prereq_class = prereqs[j];
+        // if (prereq_class=="COMP182" || prereq_class.includes("COMP182")) {
+        //     console.log(graph[i].id)
+        // }
         if (prereq_class instanceof Array) {
             for (k=0; k<prereq_class.length; k++) {
-                if (prereq_class in class_rev_hash) {
+                if (prereq_class[k] in class_rev_hash) {
                     class_rev_hash[prereq_class[k]]["postreq"].push(graph[i].id);
                 } else {
-                    class_rev_hash[prereq_class[k]] = {"postreq":[graph[i].id]}
+                    class_rev_hash[prereq_class[k]] = {"postreq":[graph[i].id],"sem":sem}
                 }
             }
         } else {
             if (prereq_class in class_rev_hash) {
                 class_rev_hash[prereq_class]["postreq"].push(graph[i].id);
             } else {
-                class_rev_hash[prereq_class] = {"postreq":[graph[i].id]}
+                class_rev_hash[prereq_class] = {"postreq":[graph[i].id],"sem":sem}
             }
         }
     }
-
 }
-// console.log("prereq for 182",class_hash["182"]["prereq"])
-// console.log("class 182 is prereq",class_rev_hash["182"]["postreq"])
+// console.log("prereq for 182",class_hash["COMP182"]["prereq"])
+// console.log("class 182 is prereq of",class_rev_hash["COMP182"]["postreq"])
 // console.log(class_rev_hash["310"])
+// Object.keys(class_rev_hash).forEach(function(course,index) {
+//     console.log(course);
+//     console.log(class_hash[course]);
+//     console.log(class_rev_hash[course]);
+// });
+
+
 
 // Add all toplevel course : class with no postrequisite
 Object.keys(class_rev_hash).forEach(function(course,index) {
@@ -67,8 +78,6 @@ Object.keys(class_hash).forEach(function(course,index) {
 });
 // console.log("bottomlevel Course:",bottomlevelCourse)
 // console.log("toplevel Course:",toplevelCourse)
-
-
 
 
 
@@ -131,7 +140,6 @@ function recommendation(list_class,this_term) {
         courses[course] = {"type":"hardreq","sem":sem}
     }
 
-
     // Add soft_req
     // console.log(required_class)
     for (i=0;i<required_class.length;i++) {
@@ -173,7 +181,6 @@ function recommendation(list_class,this_term) {
     // Object.keys(courses).forEach(function(course,index) {
     //     console.log(course,courses[course]);
     // });
-
     /* ----------- Algorithm start ----------- */
 
     /* -- Set uperbounds of classes -- */
@@ -188,10 +195,12 @@ function recommendation(list_class,this_term) {
         } else {
             term  = courses[course]["upperbound"]
         } 
-        queue.unshift([course,term]);        
+        queue.unshift([course,parseInt(term)]);        
     }
+
     while (queue) {
         node = queue.pop();
+        console.log(node)
         course = node[0];
         term = node[1];
         console.log(course,term)
@@ -229,7 +238,6 @@ function recommendation(list_class,this_term) {
 // console.log(valid(input3) + "should be False")
 // input4 = [["130",0],["182",1],["220",1],["215",2],["321",3]]
 // console.log(valid(input4) + "should be True")
-
 
 
 input4 = [["130",0],["182",1],["220",1],["215",2],["321",3]]
