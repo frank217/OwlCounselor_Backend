@@ -6,26 +6,24 @@ router.post("/", function (req, response) {
     /*
     * POST /api/course
     */
-   var body = req.body;
+   var body = req.body.json();
    console.log("[POST /api/course] body: ", body);
 
    var major = body.major;
    var degree = body.degree;
 
+
     var res = {
-        
+
         courses: [
             {
-                "id": "1001",
-                "name": "COMP 140",
+                "name": "COMP140",
             },
             {
-                "id": "1002",
-                "name": "COMP 182",
+                "name": "COMP182",
             },
             {
-                "id": "1003",
-                "name": "COMP 215",
+                "name": "COMP215",
             },
         ],
 
