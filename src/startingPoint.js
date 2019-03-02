@@ -23,16 +23,16 @@ function convert_to_output(courses) {
         var course_output = {};
         var taken = -1;
         var sems = [];
-        if (course_data["type"] == "hardreq") {
-            var course_sem = course_data["sem"];
+        if (course_data[type] == "hardreq") {
+            var course_sem = course_data[sem];
             taken = course_sem;
             sems.push(course_sem);
         } else {
-            sems = getSemesters(course, course_data["lowerbound"], course_data["upperbound"]);
+            sems = getSemesters(course, course_data[lowerbound], course_data[upperbound]);
         }
-        output.push({"name":course, "taken":taken, "sems":sems});
+        output.push({name:course, taken:taken, sems:sems});
     }
-    return output;
+    return JSON.stringify(output);
 }
 
 
