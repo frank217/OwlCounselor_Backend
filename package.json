@@ -1,0 +1,23 @@
+{
+  "name": "owlcounselor_backend",
+  "version": "1.0.0",
+  "description": "Backend Server for OwlCounselor",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frank217/OwlCounselor_Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frank217/OwlCounselor_Backend/issues"
+  },
+  "homepage": "https://github.com/frank217/OwlCounselor_Backend#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mongoose": "^5.4.16"
+  }
+}
