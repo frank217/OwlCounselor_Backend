@@ -3,7 +3,7 @@
 
 
 /* Static Degree requirement */
-var required_class = [["130","140","160"],["182"],["215"],["310"],["321"],["322"],["382"],["411","412"],["421"]]
+var required_class = [["COMP140","COMP160"],["COMP182"],["COMP215"],["COMP310"],["COMP321"],["COMP322"],["COMP382"],["COMP411","COMP412"],["COMP421"]]
 var bottomlevelCourse = [] 
 var toplevelCourse = []
 // Elective : 2 course required (BS and BA)
@@ -62,7 +62,6 @@ for (i=0; i<graph.length; i++) {
 // });
 
 
-
 // Add all toplevel course : class with no postrequisite
 Object.keys(class_rev_hash).forEach(function(course,index) {
     if (class_rev_hash[course]["postreq"] == "") {
@@ -99,7 +98,7 @@ function valid(list_class) {
         var classname = list_class[i][0];
         var sem = list_class[i][1];
         var prereqs = class_hash[classname]['prereq'];
-        console.log(classname, sem, prereqs);
+        // console.log(classname, sem, prereqs);
         if (prereqs[0]!= "") {
             // Check if all prereq has been valid
             for (j=0; j<prereqs.length; j++) {
@@ -195,25 +194,37 @@ function recommendation(list_class,this_term) {
         } else {
             term  = courses[course]["upperbound"]
         } 
-        queue.unshift([course,parseInt(term)]);        
+        queue.unshift([course,parseInt(term)]);
     }
 
-    while (queue) {
+    for (i = 0 ; i <list_class.length;i++) {
+        course = list_class[i][0];
+        // console.log(course,courses[course])
+        if (courses[course]["type"] == "hardreq") {
+            term  = courses[course]["sem"]
+        } else {
+            term  = courses[course]["upperbound"]
+        } 
+        queue.unshift([course,parseInt(term)]);
+    }
+
+
+    while (queue.length) {
         node = queue.pop();
-        console.log(node)
         course = node[0];
         term = node[1];
-        console.log(course,term)
         // add classes into class_range if not fixed then get is prereqs.
         if (courses[course]["type"] != "hardreq") {
-            if (term < courses[course]["type"]["upperbound"]) {
-                courses[course]["type"]["upperbound"] = term
+            // console.log(course,term,courses[course]["upperbound"])
+
+            if (term < courses[course]["upperbound"]) {
+                // console.log(course,term)
+                courses[course]["upperbound"] = term
             }
         }
         // Add hardreq and softreq prereq to queue
         if (courses[course]["type"] != "elective") { 
             prereqs = class_hash[course]["prereq"]
-            console.log(prereqs)
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
                 for (j=0; j < prereq.length;j++) {
@@ -224,9 +235,71 @@ function recommendation(list_class,this_term) {
         }
     }
 
+    // Object.keys(courses).forEach(function(course,index) {
+    //     if (courses[course]["type"]== "softreq"){
+    //         console.log(course,courses[course]);
+    //     }
+    // });
+
+
+    /* -- Set uperbounds of classes -- */
+    queue = [];
+    for (i = 0 ; i <bottomlevelCourse.length;i++) {
+        course = bottomlevelCourse[i]
+        if (courses[course]["type"] == "hardreq") {
+            term  = courses[course]["sem"]
+        } else {
+            term  = courses[course]["lowerbound"]
+        } 
+        queue.unshift([course,parseInt(term)]);
+    }
+
+    for (i = 0 ; i <list_class.length;i++) {
+        course = list_class[i][0];
+        // console.log(course,courses[course])
+        if (courses[course]["type"] == "hardreq") {
+            term  = courses[course]["sem"]
+        } else {
+            term  = courses[course]["lowerbound"]
+        } 
+        queue.unshift([course,parseInt(term)]);
+    }
+
+    console.log(queue)
+
+    while (queue.length) {
+        node = queue.pop();
+        course = node[0];
+        term = node[1];
+        // add classes into class_range if not fixed then get is prereqs.
+        if (courses[course]["type"] != "hardreq") {
+            // console.log(course,term,courses[course]["lowerbound"])
+
+            if (term > courses[course]["lowerbound"]) {
+                console.log(course,term)
+                courses[course]["lowerbound"] = term
+            }
+        }
+        // Add hardreq and softreq prereq to queue
+        if (courses[course]["type"] != "elective") { 
+            prereqs = class_hash[course]["prereq"]
+            for (i=0; i < prereqs.length; i++) { 
+                prereq = prereqs[i];
+                for (j=0; j < prereq.length;j++) {
+                    single_prereq = prereq[j]
+                    queue.unshift([single_prereq,term+1])
+                }
+            }
+        }
+    }
+
+
     Object.keys(courses).forEach(function(course,index) {
-        console.log(course,courses[course]);
+        if (courses[course]["type"]== "softreq"){
+            console.log(course,courses[course]);
+        }
     });
+
 
 }
 
@@ -240,5 +313,8 @@ function recommendation(list_class,this_term) {
 // console.log(valid(input4) + "should be True")
 
 
-input4 = [["130",0],["182",1],["220",1],["215",2],["321",3]]
-console.log(recommendation(input4,4) + "should be True")
+// input4 = [["COMP140",0],["COMP182",1],["COMP321",5]]
+// console.log(recommendation(input4,2) + "should be True")
+
+input4 = [["COMP140",0],["COMP182",1],["COMP321",5]]
+console.log(recommendation(input4,2) + "should be True")
