@@ -1,6 +1,18 @@
 # OwlCounselor_backend
 Backend Server for OwlCounselor
 
+# Local Development Steps
+
+- Install dependencies
+```bash
+npm install
+```
+
+- Start server
+```bash
+node app.js
+```
+
 # Database Schema
 
 - Course
