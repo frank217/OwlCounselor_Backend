@@ -50,7 +50,10 @@ class Course {
 
     Name | Type | Description 
     :--- | :---| :---
-    null | null | null
+    major  | String | the major
+    degree | Number | the type of degree                   0 - BA, 1 - BS
+    sem    | Number | the user's most recently semester    0 - 7
+    taken  | array | an array of already taken classes
 
 * **Success Response:**
     
@@ -59,23 +62,27 @@ class Course {
     
     ```json
     {
+        "valid": "true/false",
+        "message": "Success/Failure message",
         "courses": [
             {
                 "id": "1001",
                 "name": "COMP 140",
-                "sem": 2,
+                "taken": "0",     // -1 = not taken, 0 - 7 semester already taken
+                "sems": [0, 1, 2],
             },
             {
                 "id": "1002",
                 "name": "COMP 182",
-                "sem": 1,
+                "taken": -1,
+                "sems": [1, 3],
             },
             {
                 "id": "1003",
                 "name": "COMP 215",
-                "sem": 0,
+                "taken": -1,
+                "sems": [2, 4],
             },
-            
         ],
     }
     ```
@@ -86,15 +93,15 @@ class Course {
     :--- | :---| :---
     id   | string | CRN of the class
     name | string | name of the class
-    sem  | number | semester of the class
-
+    taken| number | the semester the class has been taken in. -1 if not yet taken
+    sems | number | the valid semesters to take this class
  
 * **Error Response:**
 
 * **Sample Call:**
 
 
-## Validate Courses
+## Update Bounds
 * **Description**
 
     TODO.

@@ -6,6 +6,7 @@ router.get("/", function (req, response) {
     /*
     * GET /api/course
     */
+   response.send("Endpoint /api/course");
    
 });
 
