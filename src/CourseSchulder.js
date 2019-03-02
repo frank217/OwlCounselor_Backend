@@ -30,6 +30,7 @@ for (i=0; i<graph.length; i++) {
 function processData() {
     //TODO save hastable of class : {"prereq":list_classes}
 }
+
 // Input are list of tuple(class and term)
 function valid(list_class) {
     var classes  = {};

@@ -10,7 +10,7 @@ npm install
 
 - Start server
 ```bash
-node app.js
+npm run start
 ```
 
 # Database Schema
