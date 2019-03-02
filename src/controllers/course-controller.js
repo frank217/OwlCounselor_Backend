@@ -11,9 +11,9 @@ router.post("/", function (req, response) {
 
    var major = body.major;
    var degree = body.degree;
-    
-    var res = {
 
+    var res = {
+        
         courses: [
             {
                 "id": "1001",

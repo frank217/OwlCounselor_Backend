@@ -112,6 +112,22 @@ class Course {
     sem    | Number | the user's most recently semester    0 - 7
     taken  | array | an array of already taken classes
 
+    **Content**
+
+    ```json
+    {
+        "major": "Computer Science",
+        "degree": 1,
+        "semester": 3,
+        "taken": [
+            "COMP140",
+            "COMP182",
+            "COMP215",
+            "COMP431"
+        ]
+    }
+    ```
+
 * **Success Response:**
     
   * **Code:** 200 <br />
