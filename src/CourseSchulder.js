@@ -62,9 +62,23 @@ for (i=0; i<graph.length; i++) {
 // });
 
 function check_valid_semester(courses) {
-    for (course in courses) {
-        if (class )
+    for (i=0; i < courses.length; i++) {
+        var course = courses[i][0];
+        var course_sem = courses[i][1];
+        if (course_sem < 0 || course_sem > 7) {
+            return false;
+        }
+        if (class_hash[course][sem] == "0") {
+            if (course_sem % 2 == 1) {
+                return false;
+            }
+        } else if (class_hash[course][sem] == "1") {
+            if (course_sem % 2 == 0) {
+                return false;
+            }
+        }
     }
+    return false;
 }
 
 function get_starting_point(major, degree, sem, taken) {
@@ -88,9 +102,17 @@ function validate(taken, sem) {
             if (class_hash[r][prereq].every(elem => verified.indexOf(elem) > -1)) {
                 verified.push(r);
                 remaining.pop(r);
+                flag = false
             }
         }
+        if (flag) {
+            return "Your courses have inadequate prerequisites!";
+        }
     }
+
+    // TODO bfs
+
+    return "valid";
 }
 
 function get_classes(major, degree) {
