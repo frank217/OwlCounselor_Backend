@@ -6,13 +6,12 @@ router.post("/", function (req, response) {
     /*
     * POST /api/course
     */
-   var body = req.body.json();
+   var body = req.body;
    console.log("[POST /api/course] body: ", body);
 
    var major = body.major;
    var degree = body.degree;
-
-
+    
     var res = {
 
         courses: [
