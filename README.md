@@ -30,11 +30,9 @@ class Course {
 
 # API
 
+
 ## Get courses
 * **Description**
-
-    Return the estimate data from both Uber and Lyft endpoint.
-    This endpoint also supports the upfront fare estimate.
 
 * **URL**
 
@@ -42,7 +40,7 @@ class Course {
 
 * **Method:**
   
-  `GET`
+  `POST`
   
 *  **URL Params**
 
@@ -50,7 +48,9 @@ class Course {
 
     Name | Type | Description 
     :--- | :---| :---
-    null | null | null
+    major  | String | the major
+    degree | Number | the type of degree                   0 - BA, 1 - BS
+    sem    | Number | the user's most recently semester    0 - 7
 
 * **Success Response:**
     
@@ -63,19 +63,15 @@ class Course {
             {
                 "id": "1001",
                 "name": "COMP 140",
-                "sem": 2,
             },
             {
                 "id": "1002",
                 "name": "COMP 182",
-                "sem": 1,
             },
             {
                 "id": "1003",
                 "name": "COMP 215",
-                "sem": 0,
             },
-            
         ],
     }
     ```
@@ -86,15 +82,84 @@ class Course {
     :--- | :---| :---
     id   | string | CRN of the class
     name | string | name of the class
-    sem  | number | semester of the class
-
  
 * **Error Response:**
 
 * **Sample Call:**
 
 
-## Validate Courses
+
+
+
+## Get Starting Point
+* **Description**
+
+* **URL**
+
+  /api/courses
+
+* **Method:**
+  
+  `POST`
+  
+*  **URL Params**
+
+   **Required:**
+
+    Name | Type | Description 
+    :--- | :---| :---
+    major  | String | the major
+    degree | Number | the type of degree                   0 - BA, 1 - BS
+    sem    | Number | the user's most recently semester    0 - 7
+    taken  | array | an array of already taken classes
+
+* **Success Response:**
+    
+  * **Code:** 200 <br />
+    **Content:** 
+    
+    ```json
+    {
+        "valid": "true/false",
+        "message": "Success/Failure message",
+        "courses": [
+            {
+                "id": "1001",
+                "name": "COMP 140",
+                "taken": 0,     // -1 = not taken, 0 - 7 semester already taken
+                "sems": [0, 1, 2],
+            },
+            {
+                "id": "1002",
+                "name": "COMP 182",
+                "taken": -1,
+                "sems": [1, 3],
+            },
+            {
+                "id": "1003",
+                "name": "COMP 215",
+                "taken": -1,
+                "sems": [2, 4],
+            },
+        ],
+    }
+    ```
+
+    <Coordinates of departure and destination.>
+
+    Name | Type | Description 
+    :--- | :---| :---
+    id   | string | CRN of the class
+    name | string | name of the class
+    taken| number | the semester the class has been taken in. -1 if not yet taken
+    sems | number | the valid semesters to take this class
+ 
+* **Error Response:**
+
+* **Sample Call:**
+
+
+## Update Bounds
 * **Description**
 
     TODO.
@@ -113,15 +178,25 @@ class Course {
 
     Name | Type | Description 
     :--- | :---| :---
-    src | array | an array of selected courses
-    dst | string | the id of the desired course
+    major  | String | the major
+    degree | Number | the type of degree                   0 - BA, 1 - BS
+    sem    | Number | the user's most recently semester    0 - 7
+    taken  | array | an array of already taken classes
 
     **Content**
 
     ```json
     {
-        "src": ["1001", "1002"],
-        "dst": "1003"
+        "major": "Computer Science",
+        "degree": "BS",
+        "sem": 4,
+        "taken": [
+            {
+                "id": "1003",
+                "name": "COMP 140",
+                "taken": 0,
+            }
+        ]
     }
     ```
 
@@ -131,11 +206,30 @@ class Course {
   **Code:** 200 <br />
 **Content:** 
 
-```json
-{
-    "valid": true
-}
-```
+    ```json
+    {
+            "courses": [
+                {
+                    "id": "1001",
+                    "name": "COMP 140",
+                    "taken": 0,     // -1 = not taken, 0 - 7 semester already taken
+                    "sems": [0, 1, 2],
+                },
+                {
+                    "id": "1002",
+                    "name": "COMP 182",
+                    "taken": -1,
+                    "sems": [1, 3],
+                },
+                {
+                    "id": "1003",
+                    "name": "COMP 215",
+                    "taken": -1,
+                    "sems": [2, 4],
+                },
+            ],
+        }
+    ```
 
 <Coordinates of departure and destination.>
 
