@@ -30,11 +30,71 @@ class Course {
 
 # API
 
+
 ## Get courses
 * **Description**
 
-    Return the estimate data from both Uber and Lyft endpoint.
-    This endpoint also supports the upfront fare estimate.
+* **URL**
+
+  /api/courses
+
+* **Method:**
+  
+  `GET`
+  
+*  **URL Params**
+
+   **Required:**
+
+    Name | Type | Description 
+    :--- | :---| :---
+    major  | String | the major
+    degree | Number | the type of degree                   0 - BA, 1 - BS
+    sem    | Number | the user's most recently semester    0 - 7
+
+* **Success Response:**
+    
+  * **Code:** 200 <br />
+    **Content:** 
+    
+    ```json
+    {
+        "valid": "true/false",
+        "message": "Success/Failure message",
+        "courses": [
+            {
+                "id": "1001",
+                "name": "COMP 140",
+            },
+            {
+                "id": "1002",
+                "name": "COMP 182",
+            },
+            {
+                "id": "1003",
+                "name": "COMP 215",
+            },
+        ],
+    }
+    ```
+
+    <Coordinates of departure and destination.>
+
+    Name | Type | Description 
+    :--- | :---| :---
+    id   | string | CRN of the class
+    name | string | name of the class
+ 
+* **Error Response:**
+
+* **Sample Call:**
+
+
+
+
+
+## Initial Courses
+* **Description**
 
 * **URL**
 
