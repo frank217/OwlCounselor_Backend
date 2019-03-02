@@ -50,7 +50,7 @@ class Course {
     :--- | :---| :---
     major  | String | the major
     degree | Number | the type of degree                   0 - BA, 1 - BS
-    sem    | Number | the user's most recently semester    0 - 7
+    sem    | Number | the user's most recently completed semester    0 - 7
 
 * **Success Response:**
     
