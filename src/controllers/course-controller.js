@@ -91,4 +91,34 @@ router.post("/api/courses", function (req, response) {
 });
 
 
+router.post("/getstartpoint", function (req, response) {
+    /*
+    * POST /api/getstartpoint
+    */
+   var body = req.body;
+   console.log("[POST /api/getstartpoint] body: ", body);
+
+   var major = body.major;
+   var degree = body.degree;
+    
+    var res = {
+        courses: [
+            {
+                "id": "1001",
+                "name": "COMP 140",
+            },
+            {
+                "id": "1002",
+                "name": "COMP 182",
+            },
+            {
+                "id": "1003",
+                "name": "COMP 215",
+            },
+        ],
+    };
+    response.json(res);
+});
+
+
 module.exports = router;
