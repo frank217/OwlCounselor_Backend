@@ -40,7 +40,7 @@ class Course {
 
 * **Method:**
   
-  `GET`
+  `POST`
   
 *  **URL Params**
 
@@ -59,8 +59,6 @@ class Course {
     
     ```json
     {
-        "valid": "true/false",
-        "message": "Success/Failure message",
         "courses": [
             {
                 "id": "1001",
@@ -93,7 +91,7 @@ class Course {
 
 
 
-## Initial Courses
+## Get Starting Point
 * **Description**
 
 * **URL**
@@ -102,7 +100,7 @@ class Course {
 
 * **Method:**
   
-  `GET`
+  `POST`
   
 *  **URL Params**
 
@@ -197,7 +195,6 @@ class Course {
                 "id": "1003",
                 "name": "COMP 140",
                 "taken": 0,
-                "sems": [2, 4],
             }
         ]
     }
