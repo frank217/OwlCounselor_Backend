@@ -1,4 +1,7 @@
 
+
+
+
 /* Static Degree requirement */
 var required_class = [["130","140","160"],["182"],["215"],["310"],["321"],["322"],["382"],["411","412"],["421"]]
 var bottomlevelCourse = [] 
@@ -19,8 +22,6 @@ for (i=0; i<graph.length; i++) {
     for (j=0; j<prereqs.length;j++) {
         prereqs[j] = prereqs[j].split("; ");
     }
-    // console.log(graph[i].id);
-    // console.log(prereqs);
     // Add to prerequisite of class
     class_hash[graph[i].id] = {"prereq":graph[i].prev};
     // Add to postrequisite of class
@@ -29,10 +30,20 @@ for (i=0; i<graph.length; i++) {
     }
     for (j=0; j<prereqs.length; j++) {
         prereq_class = prereqs[j];
-        if (prereq_class in class_rev_hash) {
-            class_rev_hash[prereq_class]["postreq"].push(graph[i].id);
+        if (prereq_class instanceof Array) {
+            for (k=0; k<prereq_class.length; k++) {
+                if (prereq_class in class_rev_hash) {
+                    class_rev_hash[prereq_class[k]]["postreq"].push(graph[i].id);
+                } else {
+                    class_rev_hash[prereq_class[k]] = {"postreq":[graph[i].id]}
+                }
+            }
         } else {
-            class_rev_hash[prereq_class] = {"postreq":[graph[i].id]}
+            if (prereq_class in class_rev_hash) {
+                class_rev_hash[prereq_class]["postreq"].push(graph[i].id);
+            } else {
+                class_rev_hash[prereq_class] = {"postreq":[graph[i].id]}
+            }
         }
     }
 
@@ -43,21 +54,19 @@ for (i=0; i<graph.length; i++) {
 
 // Add all toplevel course : class with no postrequisite
 Object.keys(class_rev_hash).forEach(function(course,index) {
-    console.log(course)
-    console.log(class_rev_hash[course]["postreq"])
     if (class_rev_hash[course]["postreq"] == "") {
         toplevelCourse.push(course);
     }
 });
 
-// // Add all bottomlevel course : class with not prerequisite
-// Object.keys(class_hash).forEach(function(course,index) {
-//     if (class_hash[course]["prereq"] == "") {
-//         bottomlevelCourse.push(course)
-//     }
-// });
+// Add all bottomlevel course : class with not prerequisite
+Object.keys(class_hash).forEach(function(course,index) {
+    if (class_hash[course]["prereq"] == "") {
+        bottomlevelCourse.push(course)
+    }
+});
 // console.log("bottomlevel Course:",bottomlevelCourse)
-console.log("toplevel Course:",toplevelCourse)
+// console.log("toplevel Course:",toplevelCourse)
 
 
 
@@ -82,7 +91,7 @@ function valid(list_class) {
         var sem = list_class[i][1];
         var prereqs = class_hash[classname]['prereq'];
         console.log(classname, sem, prereqs);
-        if (prereqs[0]!="") {
+        if (prereqs[0]!= "") {
             // Check if all prereq has been valid
             for (j=0; j<prereqs.length; j++) {
                 prereq = prereqs[j]
@@ -116,11 +125,13 @@ function recommendation(list_class,this_term) {
     /*  ------ Process hard_req, soft_req, elective ------ */
     var courses = {};
     // Add hard_req
-    for (i=0; i<list_class; i++) {
+    for (i=0; i<list_class.length; i++) {
         course = list_class[i][0];
         sem = list_class[i][1];
         courses[course] = {"type":"hardreq","sem":sem}
     }
+
+
     // Add soft_req
     // console.log(required_class)
     for (i=0;i<required_class.length;i++) {
@@ -158,43 +169,56 @@ function recommendation(list_class,this_term) {
         }
     });
 
+    // // prints the course
+    // Object.keys(courses).forEach(function(course,index) {
+    //     console.log(course,courses[course]);
+    // });
+
     /* ----------- Algorithm start ----------- */
 
-    var class_range = {};
-    var class_fixed = {};
-    // Fixed classes : inmutable 
-    for (i=0; i<list_class.length;i++) {
-        class_fixed[list_class[i][0]] = list_class[i][1]
-    }
-    class_fixed[changed_class] = this_term;
+    /* -- Set uperbounds of classes -- */
 
-    // Run BFS : should work fine unless there is cycle which doesn't make sense(
+    // Run BFS : should work fine unless there is cycle which doesn't make sense(edgecase consideration)
     // If cycle ever occurs check cycle checker for it)
     queue = [];
-    queue.unshift(changed_class);
-
+    for (i = 0 ; i <toplevelCourse.length;i++) {
+        course = toplevelCourse[i]
+        if (courses[course]["type"] == "hardreq") {
+            term  = courses[course]["sem"]
+        } else {
+            term  = courses[course]["upperbound"]
+        } 
+        queue.unshift([course,term]);        
+    }
     while (queue) {
         node = queue.pop();
-        class_ = node[0];
-        term = node[1]
-        // add classes into class_range if not fixed then get is prereqs. 
-        if (!(class_ in class_fixed)) {
-            if (class_ in class_range) {
-                class_range[class_][1] = term
-            } else {
-                class_range[class_] = [this_term,term]
+        course = node[0];
+        term = node[1];
+        console.log(course,term)
+        // add classes into class_range if not fixed then get is prereqs.
+        if (courses[course]["type"] != "hardreq") {
+            if (term < courses[course]["type"]["upperbound"]) {
+                courses[course]["type"]["upperbound"] = term
             }
-            // Get all prereqs put it in que 
-            prereqs = class_hash[class_]["prereq"]
-            for (i=0; i < prereqs.length; i++) {
-                prereq = prereqs[i]
+        }
+        // Add hardreq and softreq prereq to queue
+        if (courses[course]["type"] != "elective") { 
+            prereqs = class_hash[course]["prereq"]
+            console.log(prereqs)
+            for (i=0; i < prereqs.length; i++) { 
+                prereq = prereqs[i];
                 for (j=0; j < prereq.length;j++) {
                     single_prereq = prereq[j]
-                    queue
+                    queue.unshift([single_prereq,term-1])
                 }
             }
         }
     }
+
+    Object.keys(courses).forEach(function(course,index) {
+        console.log(course,courses[course]);
+    });
+
 }
 
 // input1 = [['130',0],['182',1]]
@@ -208,5 +232,5 @@ function recommendation(list_class,this_term) {
 
 
 
-// input4 = [["130",0],["182",1],["220",1],["215",2],["321",3]]
-// console.log(recommendation(input4,4) + "should be True")
+input4 = [["130",0],["182",1],["220",1],["215",2],["321",3]]
+console.log(recommendation(input4,4) + "should be True")
