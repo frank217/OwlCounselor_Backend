@@ -192,7 +192,7 @@ function isitRequirement(course) {
 
 function recommendation(list_class,this_term) {
 
-    var maxBound =5;
+    var maxBound =7;
     /*  ------ Process hard_req, soft_req, elective ------ */
     var courses = {};
     // Add hard_req
@@ -390,21 +390,18 @@ function recommendation(list_class,this_term) {
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
                 console.log(prereq)
-                // for (j=0; j < prereq.length;j++) {
-                //     single_prereq = prereq[j];
-                    // console.log(single_prereq)
                 queue.unshift([prereq,term+1]);
-                // }
+                
             }
         }
     }
-    Object.keys(courses).forEach(function(course,index) {
-        if (courses[course]["type"]== "softreq"){
-            console.log(course,courses[course]);
-        }
-    });
+    // Object.keys(courses).forEach(function(course,index) {
+    //     if (courses[course]["type"]== "softreq"){
+    //         console.log(course,courses[course]);
+    //     }
+    // });
 
-
+    return courses
 }
 
 
@@ -443,10 +440,12 @@ function convert_to_output(courses) {
     return output;
 }
 
-
 function getstartPoint(startterm) {
     return convert_to_output(recommendation([],startterm))
 }
+
+console.log(get_starting_point(0));
+
 
 // input1 = [['130',0],['182',1]]
 // console.log(valid(input1) + "should be True")
@@ -463,7 +462,7 @@ function getstartPoint(startterm) {
 
 // input4 = [["COMP140",0],["COMP182",1],["COMP321",5]]
 // console.log(recommendation(input4,2) + "should be True")
-input4 = []
-console.log(recommendation(input4,0) + "should be True")
+// input4 = []
+// console.log(recommendation(input4,0) + "should be True")
 
 
