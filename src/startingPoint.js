@@ -32,34 +32,6 @@ function convert_to_output(courses) {
         }
         output.push({name:course, taken:taken, sems:sems});
     }
-    return JSON.stringify(output);
+    return output;
 }
 
-
-
-
-function get_starting_point(major, degree, sem, taken) {
-    // Something like this, edit based on where graphs are and such
-    var graph = get_graph(major, degree);
-    var validation = validate(graph, sem, taken)
-    var valid = true;
-    var courses = [];
-    if (validation == "valid") {
-        valid = true;
-        assume_taken_dates(graph, sem, taken);
-        courses = get_classes(graph);
-    }
-    return valid, validation, courses;
-}
-
-function validate(graph, sem, taken) {
-    
-}
-
-function assume_taken_dates(graph, sem, taken) {
-
-}
-
-function get_classes(graph) {
-
-}
