@@ -218,8 +218,8 @@ function recommendation(list_class,this_term) {
                     courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
                 } else {
                     if (class_hash[course]["semavail"]!= maxBound%2) {
-                        console.log(course)
-                        console.log(class_hash[course]["semavail"],maxBound%2)
+                        // console.log(course)
+                        // console.log(class_hash[course]["semavail"],maxBound%2)
                         courses[course] = {"type":"softreq","upperbound":maxBound-1,"lowerbound":parseInt(this_term)}
                     } else {
                         courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
@@ -395,11 +395,15 @@ function recommendation(list_class,this_term) {
             }
         }
     }
-    // Object.keys(courses).forEach(function(course,index) {
-    //     if (courses[course]["type"]== "softreq"){
-    //         console.log(course,courses[course]);
-    //     }
-    // });
+    Object.keys(courses).forEach(function(course,index) {
+        if (courses[course]["type"]== "softreq"){
+            console.log(course,courses[course]);
+        }
+        // if (courses[course]["type"]== "hardreq"){
+        //     console.log(course,courses[course]);
+        // }
+        // console.log(course,courses[course]);
+    });
 
     return courses
 }
@@ -418,7 +422,7 @@ function getSemesters(course_name, lowerbound, upperbound) {
             sems.push(i);
         }
     }
-    console.log("sems",sems)
+    // console.log("sems",sems)
     return sems;
 }
 
@@ -427,7 +431,7 @@ function convert_to_output(courses) {
     var output = [];
     for (var course in courses) {
         course_data = courses[course];
-        console.log(course ,course_data)
+        // console.log(course ,course_data)
         var course_output = {};
         var taken = -1;
         var sems = [];
@@ -436,7 +440,7 @@ function convert_to_output(courses) {
             taken = course_sem;
             sems.push(course_sem);
         } else {
-            console.log("before Getsemester")
+            // console.log("before Getsemester")
             sems = getSemesters(course, course_data["lowerbound"], course_data["upperbound"]);
         }
         output.push({name:course, taken:taken, sems:sems});
@@ -444,17 +448,25 @@ function convert_to_output(courses) {
     return output;
 }
 
-function getstartPoint(startterm) {
+function getstartPoint(data,startterm) {
     var a = convert_to_output(recommendation([],startterm))
-    keys = Object.keys(a);
-    for (i =0; i< keys.length; i++){
-        console.log(keys[i])
-        console.log(a[keys[i]])
+    var res = {}
+    
+    for (i =0; i< a.length; i++){
+        c = a[i]["name"] 
+        // console.log(c)
+        if (data.includes(c)) {
+            // console.log(c)
+            var s = a[i]["sems"]
+            // console.log(s[s.length-1])
+            res[c] = s[s.length-1]
+        }
     }
-    return a
+    // console.log(c)
+    // return res
 }
 
-console.log(getstartPoint(0));
+console.log(getstartPoint(["COMP140","COMP182"],0));
 
 
 // input1 = [['130',0],['182',1]]
