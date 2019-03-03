@@ -373,28 +373,31 @@ function recommendation(list_class,this_term) {
         node = queue.pop();
         course = node[0];
         term = node[1];
+        // console.log(course)
         // add classes into class_range if not fixed then get is prereqs.
         if (courses[course]["type"] != "hardreq") {
             // console.log(course,term,courses[course]["lowerbound"])
             if (term > courses[course]["lowerbound"]) {
-                console.log(course,term)
+                // console.log(course,term)
                 courses[course]["lowerbound"] = term
             }
         }
+
         // Add hardreq and softreq prereq to queue
         if (courses[course]["type"] != "elective") { 
-            prereqs = class_hash[course]["prereq"]
+            prereqs = class_rev_hash[course]["postreq"]
+            console.log(prereqs)
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
-                for (j=0; j < prereq.length;j++) {
-                    single_prereq = prereq[j]
-                    queue.unshift([single_prereq,term+1])
-                }
+                console.log(prereq)
+                // for (j=0; j < prereq.length;j++) {
+                //     single_prereq = prereq[j];
+                    // console.log(single_prereq)
+                queue.unshift([prereq,term+1]);
+                // }
             }
         }
     }
-
-
     Object.keys(courses).forEach(function(course,index) {
         if (courses[course]["type"]== "softreq"){
             console.log(course,courses[course]);

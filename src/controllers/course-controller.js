@@ -67,18 +67,24 @@ router.post("/getstartpoint", function (req, response) {
    var degree = body.degree;
     
     var res = {
-        courses: [
+        "courses": [
             {
                 "id": "1001",
                 "name": "COMP 140",
+                "taken": 0,     // -1 = not taken, 0 - 7 semester already taken
+                "sems": [0, 1, 2],
             },
             {
                 "id": "1002",
                 "name": "COMP 182",
+                "taken": -1,
+                "sems": [1, 3],
             },
             {
                 "id": "1003",
                 "name": "COMP 215",
+                "taken": -1,
+                "sems": [2, 4],
             },
         ],
     };
