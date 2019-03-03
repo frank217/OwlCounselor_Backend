@@ -193,6 +193,8 @@ function isitRequirement(course) {
 }
 
 function recommendation(list_class,this_term) {
+
+    var maxBound =7;
     /*  ------ Process hard_req, soft_req, elective ------ */
     var courses = {};
     // Add hard_req
@@ -348,23 +350,63 @@ function recommendation(list_class,this_term) {
             prereqs = class_hash[course]["prereq"]
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
-                for (j=0; j < prereq.length;j++) {
-                    single_prereq = prereq[j]
-                    queue.unshift([single_prereq,term+1])
-                }
+                console.log(prereq)
+                queue.unshift([prereq,term+1]);
+                
             }
         }
     }
+    // Object.keys(courses).forEach(function(course,index) {
+    //     if (courses[course]["type"]== "softreq"){
+    //         console.log(course,courses[course]);
+    //     }
+    // });
 
-
-    Object.keys(courses).forEach(function(course,index) {
-        if (courses[course]["type"]== "softreq"){
-            console.log(course,courses[course]);
-        }
-    });
-
-
+    return courses
 }
+
+
+function getSemesters(course_name, lowerbound, upperbound) {
+    var sems = []
+    var sem = class_hash[course_name];
+    if (sem == "0" || sem == "1") {
+        for (i=lowerbound; i<upperbound; i+= 2) {
+            sems.push(i);
+        }
+    } else {
+        for (i=lowerbound; i<upperbound; i++) {
+            sems.push(i);
+        }
+    }
+    return sems;
+}
+
+// Return id, name, taken, sems
+function convert_to_output(courses) {
+    var output = [];
+    for (var course in courses) {
+        course_data = courses[course];
+        var course_output = {};
+        var taken = -1;
+        var sems = [];
+        if (course_data[type] == "hardreq") {
+            var course_sem = course_data[sem];
+            taken = course_sem;
+            sems.push(course_sem);
+        } else {
+            sems = getSemesters(course, course_data[lowerbound], course_data[upperbound]);
+        }
+        output.push({name:course, taken:taken, sems:sems});
+    }
+    return output;
+}
+
+function getstartPoint(startterm) {
+    return convert_to_output(recommendation([],startterm))
+}
+
+console.log(get_starting_point(0));
+
 
 // input1 = [['130',0],['182',1]]
 // console.log(valid(input1) + "should be True")
