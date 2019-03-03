@@ -81,39 +81,39 @@ function check_valid_semester(courses) {
     return false;
 }
 
-function get_starting_point(major, degree, sem, taken) {
-    // Something like this, edit based on where graphs are and such
-    var validation = validate(taken, sem)
-    var valid_bool = false;
-    var courses = [];
-    if (validation == "valid") {
-        valid = true;
-        courses = recommendation([], sem);
-    }
-    return {valid:valid_bool, message:validation};
-}
+// function get_starting_point(major, degree, sem, taken) {
+//     // Something like this, edit based on where graphs are and such
+//     var validation = validate(taken, sem)
+//     var valid_bool = false;
+//     var courses = [];
+//     if (validation == "valid") {
+//         valid = true;
+//         courses = recommendation([], sem);
+//     }
+//     return {valid:valid_bool, message:validation};
+// }
 
-function validate(taken, sem) {
-    var verified = [];
-    var remaining = taken;
-    while (remaining.length > 0) {
-        var flag = true;
-        for (r in remaining) {
-            if (class_hash[r][prereq].every(elem => verified.indexOf(elem) > -1)) {
-                verified.push(r);
-                remaining.pop(r);
-                flag = false
-            }
-        }
-        if (flag) {
-            return "Your courses have inadequate prerequisites!";
-        }
-    }
+// function validate(taken, sem) {
+//     var verified = [];
+//     var remaining = taken;
+//     while (remaining.length > 0) {
+//         var flag = true;
+//         for (r in remaining) {
+//             if (class_hash[r][prereq].every(elem => verified.indexOf(elem) > -1)) {
+//                 verified.push(r);
+//                 remaining.pop(r);
+//                 flag = false
+//             }
+//         }
+//         if (flag) {
+//             return "Your courses have inadequate prerequisites!";
+//         }
+//     }
 
-    // TODO bfs
+//     // TODO bfs
 
-    return "valid";
-}
+//     return "valid";
+// }
 
 function get_classes(major, degree) {
     var output = [];
@@ -386,10 +386,10 @@ function recommendation(list_class,this_term) {
         // Add hardreq and softreq prereq to queue
         if (courses[course]["type"] != "elective") { 
             prereqs = class_rev_hash[course]["postreq"]
-            console.log(prereqs)
+            // console.log(prereqs)
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
-                console.log(prereq)
+                // console.log(prereq)
                 queue.unshift([prereq,term+1]);
                 
             }
@@ -407,7 +407,8 @@ function recommendation(list_class,this_term) {
 
 function getSemesters(course_name, lowerbound, upperbound) {
     var sems = []
-    var sem = class_hash[course_name];
+    var sem = class_hash[course_name]["semavail"];
+
     if (sem == "0" || sem == "1") {
         for (i=lowerbound; i<upperbound; i+= 2) {
             sems.push(i);
@@ -417,6 +418,7 @@ function getSemesters(course_name, lowerbound, upperbound) {
             sems.push(i);
         }
     }
+    // console.log("sems",sems)
     return sems;
 }
 
@@ -425,15 +427,17 @@ function convert_to_output(courses) {
     var output = [];
     for (var course in courses) {
         course_data = courses[course];
+        // console.log(course ,course_data)
         var course_output = {};
         var taken = -1;
         var sems = [];
-        if (course_data[type] == "hardreq") {
+        if (course_data["type"] == "hardreq") {
             var course_sem = course_data[sem];
             taken = course_sem;
             sems.push(course_sem);
         } else {
-            sems = getSemesters(course, course_data[lowerbound], course_data[upperbound]);
+            // console.log("before Getsemester")
+            sems = getSemesters(course, course_data["lowerbound"], course_data["upperbound"]);
         }
         output.push({name:course, taken:taken, sems:sems});
     }
@@ -441,10 +445,16 @@ function convert_to_output(courses) {
 }
 
 function getstartPoint(startterm) {
-    return convert_to_output(recommendation([],startterm))
+    var a = convert_to_output(recommendation([],startterm))
+    keys = Object.keys(a);
+    for (i =0; i<keys.length; i++){
+        console.log(keys[i])
+        console.log(a[keys[i]])
+    }
+    return a
 }
 
-console.log(get_starting_point(0));
+// console.log(getstartPoint(0));
 
 
 // input1 = [['130',0],['182',1]]
