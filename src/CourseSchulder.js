@@ -3,7 +3,7 @@
 
 
 /* Static Degree requirement */
-var required_class = [["COMP140"],["COMP182"],["COMP215"],["COMP310"],["COMP321"],["COMP322"],["COMP382"],["COMP411","COMP412"],["COMP421"]]
+var required_class = [["COMP140","COMP160"],["COMP182"],["COMP215"],["COMP310"],["COMP321"],["COMP322"],["COMP382"],["COMP411","COMP412"],["COMP421"]]
 var bottomlevelCourse = [] 
 var toplevelCourse = []
 // Elective : 2 course required (BS and BA)
@@ -24,10 +24,10 @@ for (i=0; i<graph.length; i++) {
     // console.log(prereqs)
     // console.log(graph[i].sem)
     // Add to prerequisite of class
-    class_hash[graph[i].id] = {"prereq":graph[i].prev,"semavail":sem};
+    class_hash[graph[i].id] = {"prereq":graph[i].prev,"sem":sem};
     // Add to postrequisite of class
     if (!(graph[i].id in class_rev_hash)) {
-        class_rev_hash[graph[i].id] = {"postreq":[],"semavail":sem}
+        class_rev_hash[graph[i].id] = {"postreq":[],"sem":sem}
     }
 
     for (j=0; j<prereqs.length; j++) {
@@ -40,14 +40,14 @@ for (i=0; i<graph.length; i++) {
                 if (prereq_class[k] in class_rev_hash) {
                     class_rev_hash[prereq_class[k]]["postreq"].push(graph[i].id);
                 } else {
-                    class_rev_hash[prereq_class[k]] = {"postreq":[graph[i].id],"semavail":sem}
+                    class_rev_hash[prereq_class[k]] = {"postreq":[graph[i].id],"sem":sem}
                 }
             }
         } else {
             if (prereq_class in class_rev_hash) {
                 class_rev_hash[prereq_class]["postreq"].push(graph[i].id);
             } else {
-                class_rev_hash[prereq_class] = {"postreq":[graph[i].id],"semavail":sem}
+                class_rev_hash[prereq_class] = {"postreq":[graph[i].id],"sem":sem}
             }
         }
     }
@@ -81,39 +81,42 @@ function check_valid_semester(courses) {
     return false;
 }
 
-// function get_starting_point(major, degree, sem, taken) {
-//     // Something like this, edit based on where graphs are and such
-//     var validation = validate(taken, sem)
-//     var valid_bool = false;
-//     var courses = [];
-//     if (validation == "valid") {
-//         valid = true;
-//         courses = recommendation([], sem);
-//     }
-//     return {valid:valid_bool, message:validation};
-// }
+function get_starting_point(major, degree, sem, taken) {
+    // Something like this, edit based on where graphs are and such
+    var validation = validate(sem, taken)
+    var valid_bool = false;
+    var courses = [];
+    if (validation == "valid") {
+        valid_bool = true;
+        courses = recommendation([], sem);
+    }
+    return {valid:valid_bool, message:validation};
+}
 
-// function validate(taken, sem) {
-//     var verified = [];
-//     var remaining = taken;
-//     while (remaining.length > 0) {
-//         var flag = true;
-//         for (r in remaining) {
-//             if (class_hash[r][prereq].every(elem => verified.indexOf(elem) > -1)) {
-//                 verified.push(r);
-//                 remaining.pop(r);
-//                 flag = false
-//             }
-//         }
-//         if (flag) {
-//             return "Your courses have inadequate prerequisites!";
-//         }
-//     }
+function validate(sem, taken) {
+    var verified = [];
+    var remaining = taken;
+    while (remaining.length > 0) {
+        var flag = true;
+        for (i = 0; i<remaining.length; i++ ) {
+            var r = remaining[i];
+            if ((class_hash[r]["prereq"].length == 1) || (class_hash[r]["prereq"].every(elem => verified.indexOf(elem) > -1))) {
+                verified.push(r);
+                remaining.splice(i, 1);
+                flag = false
+                break;
+            }
+        }
+        if (flag) {
+            return "Your courses have inadequate prerequisites!";
+        }
+    }
 
-//     // TODO bfs
+    // TODO bfs
 
-//     return "valid";
-// }
+    return "valid";
+}
+
 
 function get_classes(major, degree) {
     var output = [];
@@ -202,7 +205,6 @@ function recommendation(list_class,this_term) {
         courses[course] = {"type":"hardreq","sem":sem}
     }
 
-
     // Add soft_req
     // console.log(required_class)
     for (i=0;i<required_class.length;i++) {
@@ -212,19 +214,7 @@ function recommendation(list_class,this_term) {
             course = courseSet[j]
             if (course in courses) nonetaken = false;
             if (!(course in courses)) {
-                // maxbound is not on the semeester
-                
-                if (class_hash[course]["semavail"] ==2) {
-                    courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                } else {
-                    if (class_hash[course]["semavail"]!= maxBound%2) {
-                        console.log(course)
-                        console.log(class_hash[course]["semavail"],maxBound%2)
-                        courses[course] = {"type":"softreq","upperbound":maxBound-1,"lowerbound":parseInt(this_term)}
-                    } else {
-                        courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                    }
-                }
+                courses[course] = {"type":"softreq","upperbound":8,"lowerbound":parseInt(this_term)}
             }
         }
         // None of the corequisite is taken any become soft requirement
@@ -232,33 +222,15 @@ function recommendation(list_class,this_term) {
             for (j=0; j<courseSet.length;j++) {
                 course = courseSet[j]
                 if (!(course in courses)) {
-                    // maxbound is not on the semeester
-                    if (class_hash[course]["semavail"] ==2) {
-                        courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                    } else {
-                        if (class_hash[course]["semavail"]!= maxBound%2) {
-                            courses[course] = {"type":"softreq","upperbound":maxBound-1,"lowerbound":parseInt(this_term)}
-                        } else {
-                            courses[course] = {"type":"softreq","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                        }
-                    }
+                    courses[course] = {"type":"softreq","upperbound":8,"lowerbound":parseInt(this_term)}
                 }
             }
         // At least one is taken : other classes are elective
         } else {
             for (j=0; j<courseSet.length;j++) {
-                course = courseSet[j];
+                course = courseSet[j]
                 if (!(course in courses)) {
-                    // maxbound is not on the semeester
-                    if (class_hash[course]["semavail"] ==2) {
-                        courses[course] = {"type":"elective","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                    } else {
-                        if (class_hash[course]["semavail"]!= maxBound%2) {
-                            courses[course] = {"type":"elective","upperbound":maxBound-1,"lowerbound":parseInt(this_term)}
-                        } else {
-                            courses[course] = {"type":"elective","upperbound":maxBound,"lowerbound":parseInt(this_term)}
-                        }
-                    }
+                    courses[course] = {"type":"elective","upperbound":8,"lowerbound":parseInt(this_term)}
                 }
             }
         }
@@ -266,7 +238,7 @@ function recommendation(list_class,this_term) {
     // Add elective
     Object.keys(class_hash).forEach(function(course,index) {
         if (!(course in courses)) {
-            courses[course] = {"type":"elective","upperbound":maxBound,"lowerbound":parseInt(this_term)}
+            courses[course] = {"type":"elective","upperbound":8,"lowerbound":parseInt(this_term)}
         }
     });
 
@@ -323,15 +295,7 @@ function recommendation(list_class,this_term) {
                 prereq = prereqs[i];
                 for (j=0; j < prereq.length;j++) {
                     single_prereq = prereq[j]
-                    // if (class_hash[course]["semavail"] ==2 ) {
-                        queue.unshift([single_prereq,term-1])
-                    // } else {
-                    //     if (class_hash[single_prereq]["semavail"] != (term)%2) {
-                    //         queue.unshift([single_prereq,term-2])
-                    //     } else{
-                    //         queue.unshift([single_prereq,term-1])
-                    //     }
-                    // }
+                    queue.unshift([single_prereq,term-1])
                 }
             }
         }
@@ -367,26 +331,26 @@ function recommendation(list_class,this_term) {
         queue.unshift([course,parseInt(term)]);
     }
 
-    // console.log(queue)
+    console.log(queue)
 
     while (queue.length) {
         node = queue.pop();
         course = node[0];
         term = node[1];
-        // console.log(course)
         // add classes into class_range if not fixed then get is prereqs.
         if (courses[course]["type"] != "hardreq") {
             // console.log(course,term,courses[course]["lowerbound"])
+
             if (term > courses[course]["lowerbound"]) {
-                // console.log(course,term)
+                console.log(course,term)
                 courses[course]["lowerbound"] = term
             }
         }
-
         // Add hardreq and softreq prereq to queue
         if (courses[course]["type"] != "elective") { 
             prereqs = class_rev_hash[course]["postreq"]
             // console.log(prereqs)
+
             for (i=0; i < prereqs.length; i++) { 
                 prereq = prereqs[i];
                 // console.log(prereq)
@@ -470,9 +434,9 @@ function getstartPoint(startterm) {
 // input4 = [["COMP140",0],["COMP182",1],["COMP321",5]]
 // console.log(recommendation(input4,2) + "should be True")
 
-// input4 = [["COMP140",0],["COMP182",1],["COMP321",5]]
+taken_courses = ["COMP140","COMP182","COMP215"]
 // console.log(recommendation(input4,2) + "should be True")
-// input4 = []
-// console.log(recommendation(input4,0) + "should be True")
+
+console.log(get_starting_point("CS", 0, 5, taken_courses))
 
 

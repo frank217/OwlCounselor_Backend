@@ -40,16 +40,13 @@ router.post("/", function (req, response) {
 });
 
 
-
-
-
 router.post("/getstartpoint", function (req, response) {
     /*
     * POST /api/getstartpoint
     */
    var body = req.body;
    console.log("[POST /api/getstartpoint] body: ", body);
-
+    
    var major = body.major;
    var degree = body.degree;
     

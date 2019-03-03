@@ -1,6 +1,7 @@
 // Library
 var express = require("express");
 var bodyParser = require("body-parser");
+var cors = require("cors");
 
 var app = express();
 
@@ -9,6 +10,7 @@ var courseController = require("./controllers/course-controller");
 
 // Middlewares
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use("/api/course", courseController);
 
